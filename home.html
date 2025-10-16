@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>New Movies Hub</title>
+
+  <script async="async" data-cfasync="false" src="//pl27862741.effectivegatecpm.com/c3b594c7be0f3f0bb1e7dc503eb657db/invoke.js"></script>
+  <div id="container-c3b594c7be0f3f0bb1e7dc503eb657db"></div>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9661351636599961"
+     crossorigin="anonymous"></script>
+  <meta name="google-adsense-account" content="ca-pub-9661351636599961">
+
+  <!-- ✅ Firebase Login Check -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } 
+    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAVDNb6kqr5wjIO20XNgMEuXtwwx_1ViMo",
+      authDomain: "mini-ac455.firebaseapp.com",
+      projectId: "mini-ac455",
+      storageBucket: "mini-ac455.firebasestorage.app",
+      messagingSenderId: "83336316469",
+      appId: "1:83336316469:web:5f322a38a090b947bc537c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Redirect to login page if not logged in
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+      }
+    });
+
+    // Logout function
+    window.logoutUser = async function() {
+      await signOut(auth);
+      window.location.href = "index.html";
+    };
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f0f0f0;
+      flex-direction: column;
+    }
+    .clickable-img {
+      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      margin: 20px;
+    }
+    .clickable-img:hover {
+      transform: scale(1.05);
+    }
+    .logout-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .logout-btn:hover {
+      background-color: darkred;
+    }
+  </style>
+</head>
+
+<body>
+  <button class="logout-btn" onclick="logoutUser()">Logout</button>
+
+  <header>
+    <h1 style="background-color: black; color: red; padding: 10px; text-align: center;">PUSPA 2</h1>
+  </header>
+
+  <a href="https://siddiquiytbooster.netlify.app/" target="_blank" rel="noopener noreferrer">
+    <img src="img_8803-1.jpg" alt="PUSPA 2" class="clickable-img">
+  </a>
+
+  <header>
+    <h1 style="background-color: black; color: red; padding: 10px; text-align: center;">Saiyara</h1>
+  </header>
+
+  <a href="https://siddiquiytbooster.netlify.app/" target="_blank" rel="noopener noreferrer">
+    <img src="122709565.jpg" alt="Saiyara" class="clickable-img">
+  </a>
+
+  <script async="async" data-cfasync="false" src="//pl27862741.effectivegatecpm.com/c3b594c7be0f3f0bb1e7dc503eb657db/invoke.js"></script>
+  <div id="container-c3b594c7be0f3f0bb1e7dc503eb657db"></div>
+</body>
+</html>
