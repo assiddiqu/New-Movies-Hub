@@ -1,60 +1,44 @@
-<!-- Save as admin.html -->
+<!-- Save as admin.html (updated: restrict to allowed admins) -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Panel — Realtime Viewers</title>
+  <title>Admin Panel — Realtime Viewers (restricted)</title>
   <style>
-    /* Simple UI similar to image: dark sidebar + topbar + cards */
-    :root {
-      --nav:#12314a; --accent:#ff6a3d; --bg:#f4f6f8; --card:#ffffff;
-      --muted:#95a1ad;
-    }
-    *{box-sizing:border-box;font-family:Inter, system-ui, Arial;}
-    body{margin:0;background:var(--bg);color:#17223b;}
-    .layout{display:flex;min-height:100vh;}
-    /* Sidebar */
-    .sidebar{
-      width:260px;background:linear-gradient(180deg,var(--nav),#0d2a3d);color:#fff;padding:28px 18px;
-    }
+    :root{--nav:#12314a;--accent:#ff6a3d;--bg:#f4f6f8;--card:#fff;--muted:#95a1ad}
+    *{box-sizing:border-box;font-family:Inter,system-ui,Arial}
+    body{margin:0;background:var(--bg);color:#17223b}
+    .layout{display:flex;min-height:100vh}
+    .sidebar{width:260px;background:linear-gradient(180deg,var(--nav),#0d2a3d);color:#fff;padding:28px 18px}
     .brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}
     .brand .logo{width:38px;height:38px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700}
     .menu{margin-top:8px}
     .menu a{display:block;color:rgba(255,255,255,0.9);padding:10px 8px;border-radius:8px;text-decoration:none;margin-bottom:6px}
     .menu a:hover{background:rgba(255,255,255,0.04)}
-    /* Main */
-    .main{flex:1;padding:20px 28px;}
+    .main{flex:1;padding:20px 28px}
     .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
     .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
     .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
     .big{font-size:2.6rem;font-weight:700;margin:6px 0}
     .muted{color:var(--muted)}
-    /* login form */
     .login-box{max-width:420px;margin:40px auto;padding:22px;background:#fff;border-radius:10px;box-shadow:0 8px 30px rgba(16,24,40,0.08)}
     input[type="email"],input[type="password"]{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #e6eef8}
     .btn{display:inline-block;padding:10px 14px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;border:none;font-weight:600;cursor:pointer}
-    .small{font-size:0.9rem}
     .top-actions{display:flex;gap:10px;align-items:center}
-    /* status dot */
     .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px}
     .online{background:#22c55e}
     .offline{background:#d1d5db}
+    .error{color:#b91c1c;margin-top:8px}
   </style>
 </head>
 <body>
-
 <div class="layout">
-
   <aside class="sidebar">
     <div class="brand">
       <div class="logo">P</div>
-      <div>
-        <div style="font-weight:700">Pluto Admin</div>
-        <div style="font-size:0.85rem;color:rgba(255,255,255,0.7)">Control Panel</div>
-      </div>
+      <div><div style="font-weight:700">Pluto Admin</div><div style="font-size:0.85rem;color:rgba(255,255,255,0.7)">Control Panel</div></div>
     </div>
-
     <div style="margin-top:18px">
       <div class="menu">
         <a href="#">Dashboard</a>
@@ -63,112 +47,79 @@
         <a href="#">Settings</a>
       </div>
     </div>
-
     <div style="position:absolute;left:18px;bottom:18px;color:rgba(255,255,255,0.75);font-size:0.88rem">
       Logged in as <strong id="admin-email">—</strong>
     </div>
   </aside>
 
   <main class="main">
-    <!-- login area -->
     <div id="login-area" class="login-box">
       <h2 style="margin:0 0 8px 0">Admin Login</h2>
-      <p class="small muted">Sign in with Firebase Email & Password</p>
+      <p class="muted small">Sign in with Firebase Email & Password</p>
       <input id="email" type="email" placeholder="Email" />
       <input id="password" type="password" placeholder="Password" />
       <div style="display:flex;gap:8px;margin-top:8px;">
         <button id="login-btn" class="btn">Sign in</button>
-        <button id="signup-btn" class="btn" style="background:#2b9af3">Create (signup)</button>
-        <button id="signout-btn" class="btn" style="background:#ef4444;display:none">Sign out</button>
+        <!-- signup intentionally removed in production -->
       </div>
-      <p id="login-msg" style="color:#d33;margin-top:10px"></p>
+      <p id="login-msg" class="error"></p>
+      <p style="margin-top:10px;font-size:0.9rem;color:#374151">Note: Only authorized admin emails can access dashboard.</p>
     </div>
 
-    <!-- dashboard -->
     <div id="dashboard" style="display:none;">
       <div class="topbar">
-        <div>
-          <h1 style="margin:0">Dashboard</h1>
-          <div class="muted small">Realtime viewers & admin controls</div>
-        </div>
-
+        <div><h1 style="margin:0">Dashboard</h1><div class="muted small">Realtime viewers & admin controls</div></div>
         <div class="top-actions">
           <div><span class="dot online" id="presence-dot"></span><span id="presence-status" class="muted small">Disconnected</span></div>
-          <div><button id="signout-btn2" class="btn" style="background:#ef4444">Sign out</button></div>
+          <div><button id="signout-btn" class="btn" style="background:#ef4444">Sign out</button></div>
         </div>
       </div>
 
       <div class="card-grid">
-        <div class="card">
-          <div class="muted small">Active viewers</div>
-          <div class="big" id="viewer-count">0</div>
-          <div class="muted small">Users currently connected (real-time)</div>
-        </div>
-
-        <div class="card">
-          <div class="muted small">Total presence nodes</div>
-          <div class="big" id="presence-nodes">0</div>
-          <div class="muted small">Detailed nodes in DB</div>
-        </div>
-
-        <div class="card">
-          <div class="muted small">Admin UID</div>
-          <div class="big" id="admin-uid">—</div>
-          <div class="muted small">Your Firebase UID</div>
-        </div>
-
-        <div class="card">
-          <div class="muted small">Last change</div>
-          <div id="last-change" class="muted small">—</div>
-          <div style="height:10px"></div>
-        </div>
+        <div class="card"><div class="muted small">Active viewers</div><div class="big" id="viewer-count">0</div><div class="muted small">Users currently connected (real-time)</div></div>
+        <div class="card"><div class="muted small">Total presence nodes</div><div class="big" id="presence-nodes">0</div><div class="muted small">Detailed nodes in DB</div></div>
+        <div class="card"><div class="muted small">Admin UID</div><div class="big" id="admin-uid">—</div><div class="muted small">Your Firebase UID</div></div>
+        <div class="card"><div class="muted small">Last change</div><div id="last-change" class="muted small">—</div><div style="height:10px"></div></div>
       </div>
-
     </div>
   </main>
-
 </div>
 
-<!-- Firebase v9 CDN -->
+<!-- Firebase compat libs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-/* --------- PUT YOUR FIREBASE CONFIG HERE ---------
-   Get it from Firebase console -> Project settings -> SDK setup for Web
-   Example:
-const FIREBASE_CONFIG = {
+/* ====== CONFIG ====== */
+const firebaseConfig = {
   apiKey: "AIzaSyAVDNb6kqr5wjIO20XNgMEuXtwwx_1ViMo",
   authDomain: "mini-ac455.firebaseapp.com",
   databaseURL: "https://mini-ac455-default-rtdb.firebaseio.com",
   projectId: "mini-ac455",
   storageBucket: "mini-ac455.firebasestorage.app",
   messagingSenderId: "83336316469",
-  appId: "1:83336316469:web:5f322a38a090b947bc537c"
+  appId: "1:83336316469:web:5f322a38a090b947bc537c",
+  measurementId: "G-0Y999CYWV5"
 };
---------------------------------------------------*/
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyAVDNb6kqr5wjIO20XNgMEuXtwwx_1ViMo",
-  authDomain: "mini-ac455.firebaseapp.com",
-  databaseURL: "https://mini-ac455-default-rtdb.firebaseio.com",
-  projectId: "mini-ac455",
-  storageBucket: "mini-ac455.firebasestorage.app",
-  messagingSenderId: "83336316469",
-  appId: "1:83336316469:web:5f322a38a090b947bc537c"
-};
-
 firebase.initializeApp(FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db = firebase.database();
 
-/* UI refs */
+/* ====== ADMIN LIST: Use either emails OR uids. Prefer UID for stronger security. ======
+   Example:
+   const ALLOWED_ADMINS = { emails: ['admin@example.com'], uids: ['abc123UID'] }
+   Add your admin email(s) or UID(s) here.
+*/
+const ALLOWED_ADMINS = {
+  emails: ['youremail@example.com'],   // replace with your admin email(s)
+  uids: []                             // optional: add admin UIDs for stricter control
+};
+
+/* ====== UI refs ====== */
 const loginArea = document.getElementById('login-area');
 const dashboard = document.getElementById('dashboard');
 const loginBtn = document.getElementById('login-btn');
-const signupBtn = document.getElementById('signup-btn');
-const signoutBtn = document.getElementById('signout-btn');
-const signoutBtn2 = document.getElementById('signout-btn2');
 const emailInput = document.getElementById('email');
 const passInput = document.getElementById('password');
 const loginMsg = document.getElementById('login-msg');
@@ -179,42 +130,22 @@ const adminEmailEl = document.getElementById('admin-email');
 const lastChangeEl = document.getElementById('last-change');
 const presenceDot = document.getElementById('presence-dot');
 const presenceStatus = document.getElementById('presence-status');
+const signoutBtn = document.getElementById('signout-btn');
 
-/* Auth handlers */
 loginBtn.addEventListener('click', ()=> {
   loginMsg.textContent = '';
   const email = emailInput.value.trim();
   const pw = passInput.value;
   if(!email || !pw){ loginMsg.textContent = 'Enter email and password'; return; }
-  auth.signInWithEmailAndPassword(email,pw)
-    .then(()=>{ /* handled by onAuthStateChanged */ })
-    .catch(e => loginMsg.textContent = e.message);
+  auth.signInWithEmailAndPassword(email,pw).catch(e => loginMsg.textContent = e.message);
 });
 
-signupBtn.addEventListener('click', ()=> {
-  loginMsg.textContent = '';
-  const email = emailInput.value.trim();
-  const pw = passInput.value;
-  if(!email || !pw){ loginMsg.textContent = 'Enter email and password'; return; }
-  auth.createUserWithEmailAndPassword(email,pw)
-    .then(()=>{ /* user created */ })
-    .catch(e => loginMsg.textContent = e.message);
-});
+signoutBtn.addEventListener('click', ()=> auth.signOut());
 
-function signOutAll(){
-  auth.signOut();
-}
-
-/* signout buttons */
-signoutBtn.addEventListener('click', signOutAll);
-signoutBtn2.addEventListener('click', signOutAll);
-
-/* Realtime presence listener for admin view */
+/* ====== presence listening ====== */
 let presenceRef;
 function startListeningPresence(){
-  // presence node root
   presenceRef = db.ref('presence');
-  // listen for total number of children
   presenceRef.on('value', snapshot => {
     const val = snapshot.val() || {};
     const count = Object.keys(val).length;
@@ -224,7 +155,7 @@ function startListeningPresence(){
   });
 }
 
-/* Track admin's own connection to DB (just to know panel is connected) */
+/* ====== connection status ====== */
 const connectedRef = db.ref('.info/connected');
 connectedRef.on('value', snap => {
   const connected = !!snap.val();
@@ -232,18 +163,39 @@ connectedRef.on('value', snap => {
   presenceDot.className = 'dot ' + (connected ? 'online' : 'offline');
 });
 
-/* Monitor auth state */
-auth.onAuthStateChanged(user => {
+/* ====== Auth state & admin check ====== */
+function isAllowed(user){
+  if(!user) return false;
+  const email = (user.email || '').toLowerCase();
+  if(ALLOWED_ADMINS.uids && ALLOWED_ADMINS.uids.includes(user.uid)) return true;
+  if(ALLOWED_ADMINS.emails && ALLOWED_ADMINS.emails.map(e=>e.toLowerCase()).includes(email)) return true;
+  return false;
+}
+
+auth.onAuthStateChanged(async user => {
   if(user){
-    // show dashboard
-    loginArea.style.display = 'none';
-    dashboard.style.display = 'block';
-    adminUidEl.textContent = user.uid;
-    adminEmailEl.textContent = user.email || '—';
-    // start listening
-    startListeningPresence();
+    // wait for token to be refreshed (safer) and then check claims if needed
+    try {
+      const token = await user.getIdTokenResult(true);
+      // client-side allowed check
+      if(!isAllowed(user)){
+        // unauthorized account — sign out immediately
+        loginMsg.textContent = 'This account is not authorized as admin.';
+        await auth.signOut();
+        return;
+      }
+      // authorized
+      loginArea.style.display = 'none';
+      dashboard.style.display = 'block';
+      adminUidEl.textContent = user.uid;
+      adminEmailEl.textContent = user.email || '—';
+      startListeningPresence();
+    } catch(err){
+      console.error(err);
+      loginMsg.textContent = 'Auth error: ' + err.message;
+    }
   } else {
-    // show login
+    // not signed in
     loginArea.style.display = 'block';
     dashboard.style.display = 'none';
     adminUidEl.textContent = '—';
@@ -253,5 +205,4 @@ auth.onAuthStateChanged(user => {
 });
 </script>
 </body>
-          </html>
-          
+</html>
