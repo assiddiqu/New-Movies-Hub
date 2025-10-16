@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login / Signup | New Movies Hub</title>
 
-  <!-- ✅ Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { 
@@ -14,10 +13,12 @@
       createUserWithEmailAndPassword, 
       signInWithPopup, 
       GoogleAuthProvider,
+      RecaptchaVerifier,
+      signInWithPhoneNumber,
       onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    // 🔥 Your Firebase config
+    // 🔥 Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAVDNb6kqr5wjIO20XNgMEuXtwwx_1ViMo",
       authDomain: "mini-ac455.firebaseapp.com",
@@ -31,12 +32,12 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // ✅ If user already logged in → go to home
+    // ✅ Redirect if logged in
     onAuthStateChanged(auth, (user) => {
       if (user) window.location.href = "home.html";
     });
 
-    // ✅ Email Login
+    // Email Login
     window.loginUser = async function() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -48,20 +49,19 @@
       }
     };
 
-    // ✅ Email Signup
+    // Email Signup
     window.signupUser = async function() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       try {
         await createUserWithEmailAndPassword(auth, email, password);
-        alert("Signup successful!");
         window.location.href = "home.html";
       } catch (error) {
         alert("Signup Failed: " + error.message);
       }
     };
 
-    // ✅ Google Login/Signup
+    // Google Login
     window.googleLogin = async function() {
       try {
         await signInWithPopup(auth, provider);
@@ -69,6 +69,35 @@
       } catch (error) {
         alert("Google Sign-In Failed: " + error.message);
       }
+    };
+
+    // Phone Login
+    window.phoneLogin = function() {
+      const phone = document.getElementById("phone").value;
+
+      // Setup invisible reCAPTCHA
+      window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+        'size': 'invisible',
+        'callback': (response) => {
+          // reCAPTCHA solved
+        }
+      }, auth);
+
+      const appVerifier = window.recaptchaVerifier;
+
+      signInWithPhoneNumber(auth, phone, appVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          const otp = prompt("Enter the OTP sent to your phone:");
+          return confirmationResult.confirm(otp);
+        })
+        .then((result) => {
+          alert("Phone login successful!");
+          window.location.href = "home.html";
+        })
+        .catch((error) => {
+          alert("Phone login failed: " + error.message);
+        });
     };
   </script>
 
@@ -113,7 +142,7 @@
       background-color: darkred;
     }
     .switch {
-      margin-top: 15px;
+      margin-top: 10px;
       cursor: pointer;
       color: #ff8080;
     }
@@ -124,7 +153,7 @@
       padding: 10px;
       border-radius: 8px;
       width: 95%;
-      margin-top: 15px;
+      margin-top: 10px;
       cursor: pointer;
     }
     .google-btn:hover {
@@ -135,19 +164,27 @@
 <body>
   <div class="login-box">
     <h2 id="form-title">Login to New Movies Hub</h2>
+
+    <!-- Email login/signup -->
     <input type="email" id="email" placeholder="Email" /><br>
     <input type="password" id="password" placeholder="Password" /><br>
-
     <button id="login-btn" onclick="loginUser()">Login</button>
     <button id="signup-btn" style="display:none;" onclick="signupUser()">Sign Up</button>
 
+    <!-- Google Login -->
     <button class="google-btn" onclick="googleLogin()">Continue with Google</button>
 
+    <!-- Phone Login -->
+    <input type="text" id="phone" placeholder="+91 9876543210" /><br>
+    <button onclick="phoneLogin()">Login with Phone</button>
+
+    <div id="recaptcha-container"></div>
+
+    <!-- Switch login/signup -->
     <div class="switch" id="switch-mode" onclick="toggleMode()">Don't have an account? Sign up</div>
   </div>
 
   <script>
-    // 🔁 Toggle between Login and Signup mode
     function toggleMode() {
       const formTitle = document.getElementById("form-title");
       const loginBtn = document.getElementById("login-btn");
