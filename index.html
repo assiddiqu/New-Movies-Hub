@@ -15,7 +15,8 @@
       GoogleAuthProvider,
       RecaptchaVerifier,
       signInWithPhoneNumber,
-      onAuthStateChanged 
+      sendPasswordResetEmail,
+      onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     // 🔥 Firebase Config
@@ -32,7 +33,7 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // ✅ Redirect if logged in
+    // ✅ Redirect if already logged in
     onAuthStateChanged(auth, (user) => {
       if (user) window.location.href = "home.html";
     });
@@ -55,6 +56,7 @@
       const password = document.getElementById("password").value;
       try {
         await createUserWithEmailAndPassword(auth, email, password);
+        alert("Signup successful!");
         window.location.href = "home.html";
       } catch (error) {
         alert("Signup Failed: " + error.message);
@@ -74,13 +76,11 @@
     // Phone Login
     window.phoneLogin = function() {
       const phone = document.getElementById("phone").value;
+      if (!phone) { alert("Enter phone number!"); return; }
 
-      // Setup invisible reCAPTCHA
       window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
         'size': 'invisible',
-        'callback': (response) => {
-          // reCAPTCHA solved
-        }
+        'callback': (response) => {}
       }, auth);
 
       const appVerifier = window.recaptchaVerifier;
@@ -91,13 +91,25 @@
           const otp = prompt("Enter the OTP sent to your phone:");
           return confirmationResult.confirm(otp);
         })
-        .then((result) => {
+        .then(() => {
           alert("Phone login successful!");
           window.location.href = "home.html";
         })
         .catch((error) => {
           alert("Phone login failed: " + error.message);
         });
+    };
+
+    // Forgot Password
+    window.forgotPassword = async function() {
+      const email = document.getElementById("email").value;
+      if (!email) { alert("Enter email first!"); return; }
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset email sent! Check your inbox.");
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
     };
   </script>
 
@@ -159,6 +171,12 @@
     .google-btn:hover {
       background-color: #3367D6;
     }
+    .forgot-pass {
+      margin-top: 5px;
+      color: #ff8080;
+      text-decoration: underline;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -171,13 +189,15 @@
     <button id="login-btn" onclick="loginUser()">Login</button>
     <button id="signup-btn" style="display:none;" onclick="signupUser()">Sign Up</button>
 
+    <!-- Forgot password -->
+    <div class="forgot-pass" onclick="forgotPassword()">Forgot Password?</div>
+
     <!-- Google Login -->
     <button class="google-btn" onclick="googleLogin()">Continue with Google</button>
 
     <!-- Phone Login -->
     <input type="text" id="phone" placeholder="+91 9876543210" /><br>
     <button onclick="phoneLogin()">Login with Phone</button>
-
     <div id="recaptcha-container"></div>
 
     <!-- Switch login/signup -->
@@ -185,6 +205,7 @@
   </div>
 
   <script>
+    // Toggle login/signup
     function toggleMode() {
       const formTitle = document.getElementById("form-title");
       const loginBtn = document.getElementById("login-btn");
